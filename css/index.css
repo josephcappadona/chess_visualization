@@ -1,0 +1,7 @@
+.cg-wrap coords.ranks {
+    transform: translateY(-2%) !important;
+}
+
+coord {
+    font-size: 20px;
+}

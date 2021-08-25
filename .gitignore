@@ -1,0 +1,7 @@
+*.csv
+*.bz2
+__pycache__/
+node_modules/
+static/
+package-lock.json
+venv/
