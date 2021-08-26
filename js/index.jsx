@@ -58,8 +58,8 @@ const useStyles = makeStyles({
     loadPuzzleButton: {
         fontSize: 18
     },
-    loadingSpinner: {
-        margin: 'auto 0'
+    buttonAdjacent: {
+        margin: 'auto 10px'
     },
 
     vizAndMoveContainer: {
@@ -101,14 +101,16 @@ function App(props) {
         },
         curPuzzle: {},
         prevPuzzles: [],
-        puzzleLoading: false
+        puzzleLoading: false,
+        responseMessage: ""
     });
 
     const {
         puzzleParams,
         curPuzzle,
         prevPuzzles,
-        puzzleLoading
+        puzzleLoading,
+        responseMessage
     } = state;
 
     const puzzleParamsCallback = (newParams) => {
@@ -130,15 +132,28 @@ function App(props) {
             axios.post(HOST + '/api/puzzles', json, params)
                 .then(response => {
                     console.log('response.data', response.data);
-                    const newPuzzle = response.data.puzzles[0];
-                    setState(prevState => {
-                        return {
-                            ...prevState,
-                            curPuzzle: newPuzzle,
-                            prevPuzzles: [...prevPuzzles, newPuzzle.puzzleID],
-                            puzzleLoading: false
-                        };
-                    });
+                    const message = response.data.message;
+                    if (response.data.puzzles.length > 0) {
+                        const newPuzzle = response.data.puzzles[0];
+                        setState(prevState => {
+                            return {
+                                ...prevState,
+                                curPuzzle: newPuzzle,
+                                prevPuzzles: [...prevPuzzles, newPuzzle.puzzleID],
+                                puzzleLoading: false,
+                                responseMessage: message
+                            };
+                        });
+                    } else {
+                        setState(prevState => {
+                            return {
+                                ...prevState,
+                                curPuzzle: {},
+                                puzzleLoading: false,
+                                responseMessage: message
+                            };
+                        });
+                    }
             });
         }
     }, [puzzleLoading]);
@@ -186,9 +201,11 @@ function App(props) {
                                     className={classes.loadPuzzleButton}
                                     onClick={loadPuzzles}
                                     disabled={puzzleLoading}>Load Puzzle</Button>
-                                <Spinner
-                                    className={classes.loadingSpinner}
-                                    hidden={!puzzleLoading} animation="border" />
+                                <div className={classes.buttonAdjacent}>
+                                    {puzzleLoading ?
+                                        <Spinner animation="border"/> :
+                                        <div>{responseMessage}</div>}
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -110,9 +110,13 @@ def get_puzzles(
                               & (puzzles_df['Popularity'] >= popularity_threshold)]
     if themes:
         query_df = query_df.loc[puzzles_df['ThemesSet'].apply(lambda x: themesOp(theme in x for theme in themes))]
-                              
-    random_ids = random.sample(range(query_df.shape[0]), count)
-    puzzle_ids = query_df.index[random_ids].tolist()
 
-    puzzle_dicts = [extract_puzzle(query_df, id_, plies_backward) for id_ in puzzle_ids]
-    return puzzle_dicts
+    try:                          
+        random_ids = random.sample(range(query_df.shape[0]), count)
+        puzzle_ids = query_df.index[random_ids].tolist()
+
+        puzzle_dicts = [extract_puzzle(query_df, id_, plies_backward) for id_ in puzzle_ids]
+        return puzzle_dicts
+
+    except ValueError:
+        return []

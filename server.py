@@ -34,8 +34,11 @@ def api_analysis():
         exclude=data['prevPuzzles']
     )
 
+    msg = "" if puzzles else "No such puzzles"
+
     ret = dict(
-        puzzles=puzzles
+        puzzles=puzzles,
+        message=msg
     )
             
     return json.dumps(ret), 201
