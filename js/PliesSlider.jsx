@@ -55,8 +55,7 @@ const PliesSlider = ({ lower, upper, step, defaultValue, callback }) => {
               min: lower,
               max: upper,
               step: step,
-              type: "number",
-              "aria-labelledby": "input-slider"
+              type: "number"
             }}
           />
         </Grid>
@@ -65,7 +64,6 @@ const PliesSlider = ({ lower, upper, step, defaultValue, callback }) => {
             className={classes.slider}
             value={isValid(value) ? value : cleanValue(value)}
             onChange={handleSliderChange}
-            aria-labelledby="input-slider"
             min={lower}
             max={upper}
             step={step}

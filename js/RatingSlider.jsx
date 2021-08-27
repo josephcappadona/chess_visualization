@@ -74,8 +74,7 @@ const RatingSlider = ({ lower, upper, step, defaultValue, callback }) => {
               min: lower,
               max: value[1] - step,
               step: step,
-              type: "number",
-              "aria-labelledby": "input-slider"
+              type: "number"
             }}
           />
         </Grid>
@@ -84,7 +83,6 @@ const RatingSlider = ({ lower, upper, step, defaultValue, callback }) => {
             className={classes.slider}
             value={isValid(value) ? value : cleanValue(value)}
             onChange={handleSliderChange}
-            aria-labelledby="input-slider"
             min={lower}
             max={upper}
             step={step}
@@ -100,8 +98,7 @@ const RatingSlider = ({ lower, upper, step, defaultValue, callback }) => {
               min: value[0] + step,
               max: upper,
               step: step,
-              type: "number",
-              "aria-labelledby": "input-slider"
+              type: "number"
             }}
           />
         </Grid>

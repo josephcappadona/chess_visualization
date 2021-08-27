@@ -5,3 +5,4 @@ node_modules/
 static/
 package-lock.json
 venv/
+sql_credentials.yaml

@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PuzzleParams from './PuzzleParams.jsx';
 import Visualize from './Visualize.jsx';
 import PuzzleInput from './PuzzleInput.jsx';
+import { isEmpty, format, formatTimeControl } from './utils.jsx';
 
 import Chessground from 'react-chessground'
 import 'react-chessground/dist/styles/chessground.css'
@@ -30,9 +31,24 @@ const useStyles = makeStyles({
     board: {
         margin: '0 30px 30px 0'
     },
-    underBoard: {},
-    gameURL: {
-        fontSize: 20
+    underBoard: {
+        fontSize: 20,
+        width: 500
+    },
+    topLine: {
+        display: 'flex',
+        paddingBottom: 10
+    },
+    gameURL: {},
+    rating: {
+        marginLeft: 'auto'
+    },
+    matchInfo: {
+        fontSize: 15
+    },
+    openingInfo: {
+        fontSize: 15,
+        wordBreak: 'break-all'
     },
 
 
@@ -46,7 +62,7 @@ const useStyles = makeStyles({
     paramsContainer: {
         display: 'flex',
         width: 550,
-        height: 300
+        minHeight: 300
     },
     params: {
         width: 'max-content'
@@ -139,7 +155,7 @@ function App(props) {
                             return {
                                 ...prevState,
                                 curPuzzle: newPuzzle,
-                                prevPuzzles: [...prevPuzzles, newPuzzle.puzzleID],
+                                prevPuzzles: [...prevPuzzles, newPuzzle.puzzleId],
                                 puzzleLoading: false,
                                 responseMessage: message
                             };
@@ -167,27 +183,39 @@ function App(props) {
                 <div className={classes.board}>
                     <Chessground
                         fen={
-                            Object.keys(curPuzzle).length === 0 ?
+                            isEmpty(curPuzzle) ?
                             "8/8/8/8/8/8/8/8 w - - 0 1" :
                             curPuzzle.startingFEN
                         }
                         viewOnly={true}
                         orientation={
-                            Object.keys(curPuzzle).length === 0
+                            isEmpty(curPuzzle) 
                                 || curPuzzle.puzzlePly % 2 === 0 ?
                             'white' : 'black'
                         }
-                        //coordinates={boardNotation}
                         width={500}
                         height={500}
                     />
                 </div>
                 
-                <div className={classes.underBoard}>
-                    <div className={classes.gameURL}>
-                        {Object.keys(curPuzzle).length !== 0 ? curPuzzle.puzzleURL : ""}
-                    </div>
-                </div>
+                {!isEmpty(curPuzzle) ?
+                    <div className={classes.underBoard}>
+                        <div className={classes.topLine}>
+                            <div>{ curPuzzle.puzzleURL }</div>
+                            <div className={classes.rating}>{ "Rating: " + curPuzzle.rating }</div>
+                        </div>
+                        <div className={classes.matchInfo}>
+                            { format("[%s] %s (%s) vs %s (%s)", 
+                                     [formatTimeControl(curPuzzle.headers.TimeControl),
+                                      curPuzzle.headers.White,
+                                      curPuzzle.headers.WhiteElo,
+                                      curPuzzle.headers.Black,
+                                      curPuzzle.headers.BlackElo]) }</div>
+                        <div className={classes.openingInfo}>
+                            { format("%s: %s", 
+                                     [curPuzzle.headers.ECO,
+                                      curPuzzle.headers.Opening]) }</div>
+                    </div> : ""}
             </div>
             
 
@@ -213,7 +241,7 @@ function App(props) {
                         <div className={classes.vizAndMove}>
                             <div className={classes.vizContainer}>
                                 <div className={classes.viz}>
-                                    {Object.keys(curPuzzle).length !== 0 ?
+                                    { !isEmpty(curPuzzle) ?
                                         <Visualize
                                             startingPly={curPuzzle.startingPly}
                                             visualizeMoves={curPuzzle.visualizeMoves}
@@ -222,9 +250,9 @@ function App(props) {
                             </div>
                             <div className={classes.puzzleContainer}>
                                 <div className={classes.puzzle}>
-                                    {Object.keys(curPuzzle).length !== 0 ?
+                                    { !isEmpty(curPuzzle) ?
                                         <PuzzleInput
-                                            puzzleID={curPuzzle.puzzleID}
+                                            puzzleID={curPuzzle.puzzleId}
                                             puzzlePly={curPuzzle.puzzlePly}
                                             puzzleMoves={curPuzzle.puzzleMoves}
                                         /> : ""}
