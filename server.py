@@ -10,9 +10,9 @@ from flask import Flask, render_template, request, abort, jsonify
 import pandas as pd
 import numpy as np
 
-from py.puzzles import build_puzzle
-from py.sql import query_puzzles
-from py.utils import hash_params
+from py.visualize.puzzles import build_puzzle
+from py.visualize.sql import query_puzzles
+from py.visualize.utils import hash_params
 
 
 with open('sql_credentials.yaml', 'rt') as f:
@@ -31,8 +31,12 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+@app.route('/visualize')
+def visualize():
+    return render_template('visualize.html')
+
 @app.route('/api/puzzles', methods=['POST'])
-def api_analysis():
+def api_visualize():
     data = request.json
 
     params_identifier = hash_params(data)
@@ -66,8 +70,4 @@ def api_analysis():
 
 
 if __name__ == '__main__':
-    app.run(
-        host='0.0.0.0',
-        port=3000,
-        debug=True
-    )
+    app.run(host='0.0.0.0')

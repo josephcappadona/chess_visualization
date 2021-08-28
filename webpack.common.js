@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
     entry: {
         index: './js/index.jsx',
+        visualize: './js/visualize/index.jsx',
     },
     module: {
         rules: [
