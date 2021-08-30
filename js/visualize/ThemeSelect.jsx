@@ -12,7 +12,7 @@ const useStyles = makeStyles({
         width: 'max-content'
     },
     dropdownSearch: {
-        width: 450,
+        width: 435,
     },
     buttonGroupContainer: {
         marginLeft: 10

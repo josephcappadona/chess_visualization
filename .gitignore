@@ -7,3 +7,4 @@ package-lock.json
 venv/
 sql_credentials.yaml
 ssl_paths.yaml
+*.pem

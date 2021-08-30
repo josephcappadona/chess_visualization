@@ -6,7 +6,8 @@ import Form from 'react-bootstrap/Form';
 const useStyles = makeStyles({
     root: {
         width: 'max-content',
-        padding: 10
+        padding: 10,
+        minHeight: 180
     },
     numbering: {
         width: 35,

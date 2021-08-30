@@ -9,7 +9,7 @@ const useStyles = makeStyles({
     width: 'max-content'
   },
   slider: {
-    width: 350
+    width: 340
   },
   input: {
     width: 70

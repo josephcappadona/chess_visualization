@@ -20,12 +20,14 @@ const useStyles = makeStyles({
     root: {
         display: 'flex',
         width: 'max-content',
-        margin: '40px auto'
+        margin: '40px auto',
+        flexWrap: 'wrap-reverse'
     },
 
 
     leftHalf: {
-        paddingLeft: 10
+        paddingLeft: 10,
+        margin: '0 auto'
     },
 
     board: {
@@ -56,12 +58,10 @@ const useStyles = makeStyles({
     },
     rightHalf: {
         paddingLeft: 10,
-        width: 550,
     },
     
     paramsContainer: {
         display: 'flex',
-        width: 550,
         minHeight: 300
     },
     params: {
@@ -80,7 +80,7 @@ const useStyles = makeStyles({
 
     vizAndMoveContainer: {
         display: 'flex',
-        width: 550
+        width: 560
     },
     vizAndMove: {
         display: 'flex',
@@ -176,7 +176,7 @@ function App(props) {
 
     
     return (
-        <div className={classes.root}>
+        <div id="vizRoot" className={classes.root}>
 
             <div className={classes.leftHalf}>
 
