@@ -14,7 +14,7 @@ import Chessground from 'react-chessground'
 import 'react-chessground/dist/styles/chessground.css'
 
 const axios = require('axios').default;
-const HOST = 'http://' + window.location.host;
+const HOST = 'https://' + window.location.host;
 
 const useStyles = makeStyles({
     root: {

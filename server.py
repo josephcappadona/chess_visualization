@@ -70,4 +70,12 @@ def api_visualize():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+
+    with open('ssl_paths.yaml', 'rt') as f:
+        ssl_paths = yaml.safe_load(f)
+    ssl_context = (ssl_paths['cert'], ssl_paths['key'])
+
+    app.run(
+        host='0.0.0.0',
+        ssl_context=ssl_context
+    )

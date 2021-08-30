@@ -1,7 +1,7 @@
 import yaml
 import mysql.connector
 
-from py.puzzles import download_puzzles, load_puzzles
+from py.visualize.puzzles import download_puzzles, load_puzzles
 
 
 csv_filename = download_puzzles()
