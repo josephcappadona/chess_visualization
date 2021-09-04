@@ -3,4 +3,7 @@ def hash_params(params):
     themesHash = hash(params['themesOperator'])
     for theme in params['themes']:
         themesHash ^= hash(theme)
-    return ratingHash ^ themesHash
+    openingsHash = 0
+    for openingPair in params['openings']:
+        openingsHash ^= hash(tuple(openingPair))
+    return ratingHash ^ themesHash ^ openingsHash

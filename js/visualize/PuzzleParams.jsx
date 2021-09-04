@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import RatingSlider from './RatingSlider.jsx';
 import PliesSlider from './PliesSlider.jsx';
 import ThemeSelect from './ThemeSelect.jsx';
+import OpeningSelect from './OpeningSelect.jsx';
 
 const useStyles = makeStyles({
     root: {
@@ -24,7 +25,8 @@ const PuzzleParams = ({ defaultPlies, defaultRating, callback }) => {
         ratingRange: defaultRating,
         pliesBackward: defaultPlies,
         themes: [],
-        themesOperator: "or"
+        themesOperator: "or",
+        openings: [],
     });
     
     React.useEffect(() => {
@@ -45,6 +47,12 @@ const PuzzleParams = ({ defaultPlies, defaultRating, callback }) => {
         });
     };
 
+    const openingsCallback = (newOpenings) => {
+        setState(prevState => {
+            return {...prevState, openings: newOpenings}
+        });
+    };
+
     return (
         <div className={classes.root}>
             <div className={classes.paramContainer}>
@@ -58,6 +66,10 @@ const PuzzleParams = ({ defaultPlies, defaultRating, callback }) => {
             <div className={classes.paramContainer}>
                 <div className={classes.paramHeader}>Theme:</div>
                 <ThemeSelect callback={themesCallback} />
+            </div>
+            <div className={classes.paramContainer}>
+                <div className={classes.paramHeader}>Opening:</div>
+                <OpeningSelect callback={openingsCallback} />
             </div>
         </div>
     )

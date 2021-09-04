@@ -40,18 +40,23 @@ def get_full_pgn(game_id):
     url = f"https://lichess.org/game/export/{game_id}?evals=0&clocks=0"
     return requests.get(url).text
 
-def build_puzzle(puzzle_id, moves, rating, game_url, plies_backward=1):
+def build_puzzle(puzzle_dict, plies_backward=1):
+
+    puzzle_id = puzzle_dict['PuzzleId']
+    rating = puzzle_dict['Rating']
+    game_url = puzzle_dict['GameUrl']
+    game_moves = puzzle_dict['GameMoves']
+    
     
     puzzle_url = f"https://lichess.org/training/{puzzle_id}"
-    game_id = game_url.split('/')[3]
+    game_id = puzzle_dict['GameId']
+    # TODO: move puzzle ply to DB?
     puzzle_ply = int(game_url.split('#')[1])
     starting_ply = puzzle_ply - plies_backward
-    puzzle_moves_uci = moves.split(' ')[1:]
+    puzzle_moves_uci = puzzle_dict['Moves'].split(' ')[1:]
     num_puzzle_moves = len(puzzle_moves_uci)
 
-    game_pgn = get_full_pgn(game_id)
-    game = pgn.read_game(StringIO(game_pgn))
-    headers = dict(game.headers)
+    game = pgn.read_game(StringIO(game_moves))
 
     for _ in range(starting_ply):
         game = game.next()
@@ -86,5 +91,12 @@ def build_puzzle(puzzle_id, moves, rating, game_url, plies_backward=1):
         gameUrl=game_url,
         puzzleURL=puzzle_url,
         rating=rating,
-        headers=headers
+        white=puzzle_dict['White'],
+        black=puzzle_dict['Black'],
+        whiteElo=puzzle_dict['WhiteElo'],
+        blackElo=puzzle_dict['BlackElo'],
+        ECO=puzzle_dict['ECO'],
+        opening=puzzle_dict['Opening'],
+        themes=puzzle_dict['Themes'],
+        timeControl=puzzle_dict['TimeControl']
     )

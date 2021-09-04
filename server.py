@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 
 from py.visualize.puzzles import build_puzzle
-from py.visualize.sql import query_puzzles
+from py.visualize.sql import query_puzzles, headers
 from py.visualize.utils import hash_params
 
 
@@ -24,6 +24,7 @@ cursor.execute("USE puzzledb")
     
 
 puzzle_queue = defaultdict(set)
+query_counts = {}
 
 app = Flask(__name__)
 
@@ -44,22 +45,26 @@ def api_visualize():
 
     if not eligible:
         print(f'Querying {params_identifier}')
-        queried_puzzles = query_puzzles(cursor,
-                                rating_range=data['ratingRange'],
-                                themes=data['themes'],
-                                themes_operator=data['themesOperator'])
+        queried_puzzles, query_count = query_puzzles(cursor,
+                                                     rating_range=data['ratingRange'],
+                                                     themes=data['themes'],
+                                                     themes_operator=data['themesOperator'],
+                                                     openings=data['openings'])
         puzzle_queue[params_identifier].update(queried_puzzles)
+        query_counts[params_identifier] = query_count
         eligible = puzzle_queue[params_identifier].difference(set(data['prevPuzzles']))
         
     if eligible:
         puzzle_raw = eligible.pop()
         puzzle_queue[params_identifier].remove(puzzle_raw)
-        puzzle = build_puzzle(*puzzle_raw, plies_backward=data['pliesBackward'])
+        puzzle_dict = {k:v for k,v in zip(headers, puzzle_raw)}
+        puzzle = build_puzzle(puzzle_dict, plies_backward=data['pliesBackward'])
         puzzles = [puzzle]
+        pprint(puzzle)
     else:
         puzzles = []
     
-    msg = "" if puzzles else "No such puzzles"
+    msg = f"{query_counts[params_identifier]} such puzzles" if puzzles else "No such puzzles"
 
     ret = dict(
         puzzles=puzzles,

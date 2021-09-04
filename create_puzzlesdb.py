@@ -7,9 +7,7 @@ from io import StringIO
 from time import sleep
 
 from py.visualize.puzzles import download_puzzles, load_puzzles
-
-
-csv_filename = download_puzzles()
+from py.visualize.sql import headers, pgn_headers
 
 
 with open('sql_credentials.yaml', 'rt') as f:
@@ -25,6 +23,7 @@ except mysql.connector.errors.DatabaseError:
 
 cursor.execute("USE puzzledb")
 
+csv_filename = download_puzzles()
 
 try:
     
@@ -43,7 +42,7 @@ try:
         CREATE TABLE `Puzzles` (
         `PuzzleId` VARCHAR(5) BINARY PRIMARY KEY NOT NULL,
         `FEN` VARCHAR(100) NOT NULL,
-        `Moves` VARCHAR(150) NOT NULL,
+        `Moves` VARCHAR(300) NOT NULL,
         `Rating` INTEGER NOT NULL,
         `RatingDeviation` INTEGER NOT NULL,
         `NbPlays` INTEGER NOT NULL,
@@ -57,7 +56,8 @@ try:
         `WhiteElo` INTEGER NOT NULL,
         `BlackElo` INTEGER NOT NULL,
         `GameMoves` VARCHAR(3000) NOT NULL,
-        `GameId` VARCHAR(10) NOT NULL
+        `GameId` VARCHAR(10) NOT NULL,
+        `TimeControl` VARCHAR(10) NOT NULL
         );
     '''
     cursor.execute(create_table_query)
@@ -72,12 +72,10 @@ cursor.execute('SELECT PuzzleId FROM Puzzles')
 preloaded_puzzleIDs = set([x[0] for x in cursor])
 print(f'{len(preloaded_puzzleIDs)} puzzles already in Puzzles table')
 
-headers = ['PuzzleId', 'FEN', 'Moves', 'Rating', 'RatingDeviation', 'Popularity', 'NbPlays', 'Themes',
-           'GameUrl', 'ECO', 'Opening', 'White', 'Black', 'WhiteElo', 'BlackElo', 'GameMoves', 'GameId']
 insert_query_template = '''
     INSERT INTO Puzzles ({headers_str})
     VALUES ('{PuzzleId}', '{FEN}', '{Moves}', {Rating}, {RatingDeviation}, {Popularity}, {NbPlays}, '{Themes}',
-            '{GameUrl}', '{ECO}', '{Opening}', '{White}', '{Black}', {WhiteElo}, {BlackElo}, '{GameMoves}', '{GameId}');
+            '{GameUrl}', '{ECO}', '{Opening}', '{White}', '{Black}', {WhiteElo}, {BlackElo}, '{GameMoves}', '{GameId}', '{TimeControl}');
 '''
 lichess_pgn_url = 'https://lichess.org/games/export/_ids?opening=true'
 
@@ -93,12 +91,16 @@ def insert_puzzles(puzzle_dicts):
     except:
         return False
     game_pgns = res.text.split('\n\n\n')[:-1]
+    puzzle_dict_map = {pd['GameId']: pd for pd in puzzle_dicts}
 
     print('inserting...')
-    for puzzle_dict, game_pgn in zip(puzzle_dicts, game_pgns):
+    for game_pgn in game_pgns:
         game = chess.pgn.read_game(StringIO(game_pgn))
+        game_id = game.headers['Site'].split('/')[-1]
+        puzzle_dict = puzzle_dict_map[game_id]
+
         puzzle_dict['GameMoves'] = game_pgn.split('\n\n')[1]
-        puzzle_dict.update({k:game.headers[k] for k in headers[9:15]})
+        puzzle_dict.update({k:game.headers[k] for k in pgn_headers})
         puzzle_dict['Opening'] = puzzle_dict['Opening'].replace("'", "\\'")
         puzzle_dict['WhiteElo'] = 1500 if puzzle_dict['WhiteElo'] == "?" else puzzle_dict['WhiteElo']
         puzzle_dict['BlackElo'] = 1500 if puzzle_dict['BlackElo'] == "?" else puzzle_dict['BlackElo']

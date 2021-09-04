@@ -206,15 +206,15 @@ function App(props) {
                         </div>
                         <div className={classes.matchInfo}>
                             { format("[%s] %s (%s) vs %s (%s)", 
-                                     [formatTimeControl(curPuzzle.headers.TimeControl),
-                                      curPuzzle.headers.White,
-                                      curPuzzle.headers.WhiteElo,
-                                      curPuzzle.headers.Black,
-                                      curPuzzle.headers.BlackElo]) }</div>
+                                     [formatTimeControl(curPuzzle.timeControl),
+                                      curPuzzle.white,
+                                      curPuzzle.whiteElo,
+                                      curPuzzle.black,
+                                      curPuzzle.blackElo]) }</div>
                         <div className={classes.openingInfo}>
                             { format("%s: %s", 
-                                     [curPuzzle.headers.ECO,
-                                      curPuzzle.headers.Opening]) }</div>
+                                     [curPuzzle.ECO,
+                                      curPuzzle.opening]) }</div>
                     </div> : ""}
             </div>
             
