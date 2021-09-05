@@ -2,9 +2,8 @@ import '../../css/visualize.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { makeStyles } from "@material-ui/core/styles";
-import Button from 'react-bootstrap/Button';
-import Spinner from 'react-bootstrap/Spinner';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import PuzzleParams from './PuzzleParams.jsx';
 import Visualize from './Visualize.jsx';
 import PuzzleInput from './PuzzleInput.jsx';
@@ -227,11 +226,13 @@ function App(props) {
                             <div className={classes.buttonContainer}>
                                 <Button
                                     className={classes.loadPuzzleButton}
+                                    variant="contained"
+                                    color="primary"
                                     onClick={loadPuzzles}
                                     disabled={puzzleLoading}>Load Puzzle</Button>
                                 <div className={classes.buttonAdjacent}>
                                     {puzzleLoading ?
-                                        <Spinner animation="border"/> :
+                                        <CircularProgress /> :
                                         <div>{responseMessage}</div>}
                                 </div>
                             </div>

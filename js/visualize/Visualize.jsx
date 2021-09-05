@@ -7,11 +7,18 @@ const useStyles = makeStyles({
         padding: 10
     },
     numbering: {
-        width: 35
+        width: 35,
+        height: 40,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     move: {
         width: 60,
-        textAlign: 'center'
+        height: 40,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 
