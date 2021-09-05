@@ -1,7 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+
 
 const useStyles = makeStyles({
     root: {
@@ -9,27 +10,33 @@ const useStyles = makeStyles({
         padding: 10,
         minHeight: 180
     },
-    numbering: {
+    numberingContainer: {
         width: 35,
-        height: 35
+        height: 40,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    move: {
+    moveContainer: {
         width: 70,
-        height: 35,
-        textAlign: 'center'
+        height: 40,
+        marginLeft: 10,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     moveInput: {
-        height: 35,
+        fontSize: 18,
+        height: 40,
         padding: 0,
-        textAlign: 'center',
-        fontSize: 18
+        textAlign: 'center'
     },
     solutionButtonContainer: {
         paddingTop: 15
     },
     solutionButton: {
         padding: '3px 7px',
-        fontSize: 16
+        fontSize: 14
     }
 });
 
@@ -100,45 +107,48 @@ const PuzzleInput = ({ puzzleID, puzzlePly, puzzleMoves }) => {
                 };
                 return (
                     <div key={i} style={{display: 'flex'}}>
-                        <div className={classes.numbering}>
-                            {Math.floor(puzzlePly / 2) + 1 + i}.
+                        <div className={classes.numberingContainer}>
+                                {Math.floor(puzzlePly / 2) + 1 + i}.
                         </div>
-                        <div className={classes.move}>
-                            {playerMove === "black" ?
-                             ((i === 0 || inputMovesCorrect[i-1]) ? e[0] : "???") :
-                             <Form.Control
-                                key={puzzleID + i}
-                                className={classes.moveInput}
-                                value={inputMoves[i] || ""}
-                                onChange={onInputChange}
-                                disabled={inputMovesCorrect[i]} />}
+                        <div className={classes.moveContainer}>
+                                {playerMove === "black" ?
+                                    ((i === 0 || inputMovesCorrect[i-1]) ? e[0] : "???") :
+                                    <TextField
+                                        key={puzzleID + i}
+                                        inputProps={{style: { textAlign: 'center', paddingLeft: 5, paddingRight: 5 }}}
+                                        variant="outlined"
+                                        size="small"
+                                        value={inputMoves[i] || ""}
+                                        onChange={onInputChange}
+                                        disabled={inputMovesCorrect[i]} />}
+                            
                         </div>
-                        <div>
-                            {playerMove === "white" ?
-                             (e[1] ? 
-                                <div className={classes.move}>
-                                    {(inputMovesCorrect[i] ? e[1] : "???")}
-                                </div> : "") :
-                             <div className={classes.move}>
-                                 <Form.Control
-                                     key={puzzleID + i}
-                                     className={classes.moveInput}
-                                     value={inputMoves[i] || ""}
-                                     onChange={onInputChange}
-                                     disabled={inputMovesCorrect[i]} />
-                             </div>}
+                        <div className={classes.moveContainer}>
+                                {playerMove === "white" ?
+                                    (e[1] ? (inputMovesCorrect[i] ? e[1] : "???") : "") :
+                                    <TextField
+                                        key={puzzleID + i}
+                                        inputProps={{style: { textAlign: 'center', paddingLeft: 5, paddingRight: 5 }}}
+                                        variant="outlined"
+                                        size="small"
+                                        value={inputMoves[i] || ""}
+                                        onChange={onInputChange}
+                                        disabled={inputMovesCorrect[i]} />}
                         </div>
                     </div>
                 )
             })}
             <div className={classes.solutionButtonContainer}>
-                <Button
-                    className={classes.solutionButton}
-                    variant="secondary"
-                    hidden={inputMovesCorrect[inputMovesCorrect.length-1]}
-                    onClick={showSolution}>
-                        Show Solution
-                </Button>
+                <div hidden={inputMovesCorrect[inputMovesCorrect.length-1]}>
+                    <Button
+                        className={classes.solutionButton}
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={showSolution}>
+                            Show Solution
+                    </Button>
+                </div>
             </div>
         </div>
     );

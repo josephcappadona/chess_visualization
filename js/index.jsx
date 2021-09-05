@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { makeStyles } from "@material-ui/core/styles";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const axios = require('axios').default;
 const HOST = 'http://' + window.location.host;
