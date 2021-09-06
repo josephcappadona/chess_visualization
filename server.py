@@ -38,7 +38,11 @@ def visualize():
 
 @app.route('/api/puzzles', methods=['POST'])
 def api_visualize():
+<<<<<<< HEAD
     data = json.loads(request.json)
+=======
+    data = json.loads(request.json) if isinstance(request.json, str) else request.json
+>>>>>>> cc337bcaba5f8c8e79d9b29e2be1f1f603a709f3
 
     params_identifier = hash_params(data)
     eligible = puzzle_queue[params_identifier].difference(set(data['prevPuzzles']))
