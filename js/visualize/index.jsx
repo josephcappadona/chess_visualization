@@ -139,7 +139,7 @@ function App(props) {
 
     React.useEffect(() => {
         if (puzzleLoading) {
-            const json = JSON.stringify({ ...puzzleParams, prevPuzzles });
+            const json = { ...puzzleParams, prevPuzzles };
             console.log(json);
             const params = {
                 headers: {'Content-Type': 'application/json'}
