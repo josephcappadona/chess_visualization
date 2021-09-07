@@ -3,6 +3,7 @@ import json
 from pprint import pprint
 from pathlib import Path
 from collections import defaultdict
+import random
 
 import mysql.connector
 import yaml
@@ -10,6 +11,7 @@ from flask import Flask, render_template, request, abort, jsonify
 import pandas as pd
 import numpy as np
 
+from py.state import get_shared_state
 from py.visualize.puzzles import build_puzzle
 from py.visualize.sql import query_puzzles, headers
 from py.visualize.utils import hash_params
@@ -21,10 +23,8 @@ with open('sql_credentials.yaml', 'rt') as f:
 conn = mysql.connector.connect(**credentials)
 cursor = conn.cursor()
 cursor.execute("USE puzzledb")
-    
 
-puzzle_queue = defaultdict(set)
-query_counts = {}
+shared_dict, shared_lock = get_shared_state('127.0.0.1', 35791, b"secret")
 
 app = Flask(__name__)
 
@@ -38,26 +38,32 @@ def visualize():
 
 @app.route('/api/puzzles', methods=['POST'])
 def api_visualize():
-    print(type(request.json))
+    
     data = request.json
-
     params_identifier = hash_params(data)
-    eligible = puzzle_queue[params_identifier].difference(set(data['prevPuzzles']))
 
-    if not eligible:
+    if params_identifier not in shared_dict:
+        with shared_lock:
+            shared_dict[params_identifier] = dict(puzzles=[], query_count=0)
+
+    if not shared_dict[params_identifier]['puzzles']:
         print(f'Querying {params_identifier}')
         queried_puzzles, query_count = query_puzzles(cursor,
                                                      rating_range=data['ratingRange'],
                                                      themes=data['themes'],
                                                      themes_operator=data['themesOperator'],
                                                      openings=data['openings'])
-        puzzle_queue[params_identifier].update(queried_puzzles)
-        query_counts[params_identifier] = query_count
-        eligible = puzzle_queue[params_identifier].difference(set(data['prevPuzzles']))
-        
+        with shared_lock:
+            shared_dict[params_identifier] = dict(
+                puzzles=queried_puzzles,
+                query_count=query_count
+            )
+
+    eligible = shared_dict[params_identifier]['puzzles']
+    query_count = shared_dict[params_identifier]['query_count']
     if eligible:
-        puzzle_raw = eligible.pop()
-        puzzle_queue[params_identifier].remove(puzzle_raw)
+        with shared_lock:
+            puzzle_raw = eligible.pop(random.randint(0, len(eligible)-1))
         puzzle_dict = {k:v for k,v in zip(headers, puzzle_raw)}
         puzzle = build_puzzle(puzzle_dict, plies_backward=data['pliesBackward'])
         puzzles = [puzzle]
@@ -65,7 +71,7 @@ def api_visualize():
     else:
         puzzles = []
     
-    msg = f"{query_counts[params_identifier]} such puzzles" if puzzles else "No such puzzles"
+    msg = f"{query_count} such puzzles" if puzzles else "No such puzzles"
 
     ret = dict(
         puzzles=puzzles,
