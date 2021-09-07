@@ -40,6 +40,12 @@ const useStyles = makeStyles({
     }
 });
 
+const textInputStyle = {
+    textAlign: 'center',
+    paddingLeft: 5,
+    paddingRight: 5
+};
+
 const PuzzleInput = ({ puzzleID, puzzlePly, puzzleMoves }) => {
     const classes = useStyles();
 
@@ -105,6 +111,16 @@ const PuzzleInput = ({ puzzleID, puzzlePly, puzzleMoves }) => {
                     });
                     console.log(newVal);
                 };
+                const textInput = (
+                    <TextField
+                        key={puzzleID + i}
+                        inputProps={{ style: textInputStyle }}
+                        variant="outlined"
+                        size="small"
+                        value={inputMoves[i] || ""}
+                        onChange={onInputChange}
+                        disabled={inputMovesCorrect[i]} />
+                );
                 return (
                     <div key={i} style={{display: 'flex'}}>
                         <div className={classes.numberingContainer}>
@@ -113,27 +129,13 @@ const PuzzleInput = ({ puzzleID, puzzlePly, puzzleMoves }) => {
                         <div className={classes.moveContainer}>
                                 {playerMove === "black" ?
                                     ((i === 0 || inputMovesCorrect[i-1]) ? e[0] : "???") :
-                                    <TextField
-                                        key={puzzleID + i}
-                                        inputProps={{style: { textAlign: 'center', paddingLeft: 5, paddingRight: 5 }}}
-                                        variant="outlined"
-                                        size="small"
-                                        value={inputMoves[i] || ""}
-                                        onChange={onInputChange}
-                                        disabled={inputMovesCorrect[i]} />}
+                                    textInput}
                             
                         </div>
                         <div className={classes.moveContainer}>
                                 {playerMove === "white" ?
                                     (e[1] ? (inputMovesCorrect[i] ? e[1] : "???") : "") :
-                                    <TextField
-                                        key={puzzleID + i}
-                                        inputProps={{style: { textAlign: 'center', paddingLeft: 5, paddingRight: 5 }}}
-                                        variant="outlined"
-                                        size="small"
-                                        value={inputMoves[i] || ""}
-                                        onChange={onInputChange}
-                                        disabled={inputMovesCorrect[i]} />}
+                                    textInput}
                         </div>
                     </div>
                 )
