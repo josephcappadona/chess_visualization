@@ -16,13 +16,16 @@ from py.visualize.puzzles import build_puzzle
 from py.visualize.sql import query_puzzles, headers
 from py.visualize.utils import hash_params
 
+def connect():
+    with open('sql_credentials.yaml', 'rt') as f:
+        credentials = yaml.safe_load(f)
 
-with open('sql_credentials.yaml', 'rt') as f:
-    credentials = yaml.safe_load(f)
+    conn = mysql.connector.connect(**credentials)
+    cursor = conn.cursor()
+    cursor.execute("USE puzzledb")
+    return conn, cursor
+conn, cursor = connect_sql()
 
-conn = mysql.connector.connect(**credentials)
-cursor = conn.cursor()
-cursor.execute("USE puzzledb")
 
 shared_dict, shared_lock = get_shared_state('127.0.0.1', 35791, b"secret")
 
@@ -47,6 +50,9 @@ def api_visualize():
             shared_dict[params_identifier] = dict(puzzles=[], query_count=0)
 
     if not shared_dict[params_identifier]['puzzles']:
+        if not conn.is_connected():
+            conn, cursor = connect_sql()
+
         print(f'Querying {params_identifier}')
         queried_puzzles, query_count = query_puzzles(cursor,
                                                      rating_range=data['ratingRange'],
