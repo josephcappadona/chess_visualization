@@ -12,6 +12,10 @@ import { isEmpty, format, formatTimeControl } from './utils.jsx';
 import Chessground from 'react-chessground'
 import 'react-chessground/dist/styles/chessground.css'
 
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 const axios = require('axios').default;
 const HOST = 'https://' + window.location.host;
 
@@ -108,6 +112,16 @@ const useStyles = makeStyles({
 
 function App(props) {
     const classes = useStyles();
+    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const theme = React.useMemo(
+        () =>
+          createTheme({
+            palette: {
+              type: prefersDarkMode ? 'dark' : 'light',
+            },
+          }),
+        [prefersDarkMode],
+      );
 
     const [state, setState] = React.useState({
         puzzleParams: {
@@ -175,97 +189,100 @@ function App(props) {
 
     
     return (
-        <div id="vizRoot" className={classes.root}>
+        <ThemeProvider theme={theme}>
+            <CssBaseline/>
+            <div id="vizRoot" className={classes.root}>
 
-            <div className={classes.leftHalf}>
+                <div className={classes.leftHalf}>
 
-                <div className={classes.board}>
-                    <Chessground
-                        fen={
-                            isEmpty(curPuzzle) ?
-                            "8/8/8/8/8/8/8/8 w - - 0 1" :
-                            curPuzzle.startingFEN
-                        }
-                        viewOnly={true}
-                        orientation={
-                            isEmpty(curPuzzle) 
-                                || curPuzzle.puzzlePly % 2 === 0 ?
-                            'white' : 'black'
-                        }
-                        width={500}
-                        height={500}
-                    />
+                    <div className={classes.board}>
+                        <Chessground
+                            fen={
+                                isEmpty(curPuzzle) ?
+                                "8/8/8/8/8/8/8/8 w - - 0 1" :
+                                curPuzzle.startingFEN
+                            }
+                            viewOnly={true}
+                            orientation={
+                                isEmpty(curPuzzle) 
+                                    || curPuzzle.puzzlePly % 2 === 0 ?
+                                'white' : 'black'
+                            }
+                            width={500}
+                            height={500}
+                        />
+                    </div>
+                    
+                    {!isEmpty(curPuzzle) ?
+                        <div className={classes.underBoard}>
+                            <div className={classes.topLine}>
+                                <div>{ curPuzzle.puzzleURL }</div>
+                                <div className={classes.rating}>{ "Rating: " + curPuzzle.rating }</div>
+                            </div>
+                            <div className={classes.matchInfo}>
+                                { format("[%s] %s (%s) vs %s (%s)", 
+                                        [formatTimeControl(curPuzzle.timeControl),
+                                        curPuzzle.white,
+                                        curPuzzle.whiteElo,
+                                        curPuzzle.black,
+                                        curPuzzle.blackElo]) }</div>
+                            <div className={classes.openingInfo}>
+                                { format("%s: %s", 
+                                        [curPuzzle.ECO,
+                                        curPuzzle.opening]) }</div>
+                        </div> : ""}
                 </div>
                 
-                {!isEmpty(curPuzzle) ?
-                    <div className={classes.underBoard}>
-                        <div className={classes.topLine}>
-                            <div>{ curPuzzle.puzzleURL }</div>
-                            <div className={classes.rating}>{ "Rating: " + curPuzzle.rating }</div>
-                        </div>
-                        <div className={classes.matchInfo}>
-                            { format("[%s] %s (%s) vs %s (%s)", 
-                                     [formatTimeControl(curPuzzle.timeControl),
-                                      curPuzzle.white,
-                                      curPuzzle.whiteElo,
-                                      curPuzzle.black,
-                                      curPuzzle.blackElo]) }</div>
-                        <div className={classes.openingInfo}>
-                            { format("%s: %s", 
-                                     [curPuzzle.ECO,
-                                      curPuzzle.opening]) }</div>
-                    </div> : ""}
-            </div>
-            
 
-            <div className={classes.rightHalfContainer}>
-                <div className={classes.rightHalf}>
-                    <div className={classes.paramsContainer}>
-                        <div className={classes.params}>
-                            <PuzzleParams callback={puzzleParamsCallback} />
-                            <div className={classes.buttonContainer}>
-                                <Button
-                                    className={classes.loadPuzzleButton}
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={loadPuzzles}
-                                    disabled={puzzleLoading}>Load Puzzle</Button>
-                                <div className={classes.buttonAdjacent}>
-                                    {puzzleLoading ?
-                                        <CircularProgress /> :
-                                        <div>{responseMessage}</div>}
+                <div className={classes.rightHalfContainer}>
+                    <div className={classes.rightHalf}>
+                        <div className={classes.paramsContainer}>
+                            <div className={classes.params}>
+                                <PuzzleParams callback={puzzleParamsCallback} />
+                                <div className={classes.buttonContainer}>
+                                    <Button
+                                        className={classes.loadPuzzleButton}
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={loadPuzzles}
+                                        disabled={puzzleLoading}>Load Puzzle</Button>
+                                    <div className={classes.buttonAdjacent}>
+                                        {puzzleLoading ?
+                                            <CircularProgress /> :
+                                            <div>{responseMessage}</div>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className={classes.vizAndMoveContainer}>
-                        <div className={classes.vizAndMove}>
-                            <div className={classes.vizContainer}>
-                                <div className={classes.viz}>
-                                    { !isEmpty(curPuzzle) ?
-                                        <Visualize
-                                            startingPly={curPuzzle.startingPly}
-                                            visualizeMoves={curPuzzle.visualizeMoves}
-                                        /> : ""}
+                        <div className={classes.vizAndMoveContainer}>
+                            <div className={classes.vizAndMove}>
+                                <div className={classes.vizContainer}>
+                                    <div className={classes.viz}>
+                                        { !isEmpty(curPuzzle) ?
+                                            <Visualize
+                                                startingPly={curPuzzle.startingPly}
+                                                visualizeMoves={curPuzzle.visualizeMoves}
+                                            /> : ""}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={classes.puzzleContainer}>
-                                <div className={classes.puzzle}>
-                                    { !isEmpty(curPuzzle) ?
-                                        <PuzzleInput
-                                            puzzleID={curPuzzle.puzzleId}
-                                            puzzlePly={curPuzzle.puzzlePly}
-                                            puzzleMoves={curPuzzle.puzzleMoves}
-                                        /> : ""}
+                                <div className={classes.puzzleContainer}>
+                                    <div className={classes.puzzle}>
+                                        { !isEmpty(curPuzzle) ?
+                                            <PuzzleInput
+                                                puzzleID={curPuzzle.puzzleId}
+                                                puzzlePly={curPuzzle.puzzlePly}
+                                                puzzleMoves={curPuzzle.puzzleMoves}
+                                            /> : ""}
+                                    </div>
                                 </div>
+                                
                             </div>
-                            
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
+        </ThemeProvider>
     );
 }
 

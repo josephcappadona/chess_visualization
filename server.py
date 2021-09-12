@@ -30,6 +30,7 @@ conn, cursor = connect_sql()
 shared_dict, shared_lock = get_shared_state('127.0.0.1', 35791, b"secret")
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 @app.route('/')
 def index():
